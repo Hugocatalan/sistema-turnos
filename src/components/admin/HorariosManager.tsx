@@ -20,6 +20,7 @@ interface Actividad {
   id: string;
   nombre: string;
   color: string;
+  activo: boolean;
 }
 
 const diasSemana = [
