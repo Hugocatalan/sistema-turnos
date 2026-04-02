@@ -74,7 +74,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Credenciales requeridas');
         }
 
-        const admin = await prisma.usuario.findFirst({
+        let admin = await prisma.usuario.findFirst({
           where: {
             dni: credentials.dni,
             rol: 'ADMIN'
@@ -82,12 +82,24 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!admin) {
-          throw new Error('Administrador no encontrado');
-        }
-
-        const isValid = credentials.password === process.env.ADMIN_PASSWORD;
-        if (!isValid) {
-          throw new Error('Contraseña incorrecta');
+          if (credentials.password === process.env.ADMIN_PASSWORD) {
+            admin = await prisma.usuario.create({
+              data: {
+                dni: credentials.dni,
+                nombre: 'Admin',
+                apellido: 'Principal',
+                rol: 'ADMIN',
+                estadoMembresia: 'ACTIVA'
+              }
+            });
+          } else {
+            throw new Error('Contraseña incorrecta');
+          }
+        } else {
+          const isValid = credentials.password === process.env.ADMIN_PASSWORD;
+          if (!isValid) {
+            throw new Error('Contraseña incorrecta');
+          }
         }
 
         return {
