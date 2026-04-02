@@ -146,7 +146,7 @@ export default function TurnosPage() {
         <div className="text-center py-12">
           <Calendar size={48} className="mx-auto text-gray-300 mb-4" />
           <p className="text-gray-500">No hay turnos registrados</p>
-          <p className="text-sm text-gray-400 mt-1">Hacé clic en "Nuevo Turno" para crear uno</p>
+          <p className="text-sm text-gray-400 mt-1">Hacé clic en &quot;Nuevo Turno&quot; para crear uno</p>
         </div>
       ) : (
         <div className="space-y-4">

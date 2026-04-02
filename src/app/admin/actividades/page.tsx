@@ -103,7 +103,7 @@ export default function ActividadesPage() {
         <div className="text-center py-12 bg-white rounded-xl border border-gray-100">
           <Activity size={48} className="mx-auto text-gray-300 mb-4" />
           <p className="text-gray-500">No hay actividades cargadas</p>
-          <p className="text-sm text-gray-400 mt-1">Hacé clic en "Nueva Actividad" para comenzar</p>
+          <p className="text-sm text-gray-400 mt-1">Hacé clic en &quot;Nueva Actividad&quot; para comenzar</p>
         </div>
       ) : (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">

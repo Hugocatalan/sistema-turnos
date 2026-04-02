@@ -248,7 +248,7 @@ export function HorariosManager() {
           />
           {actividades.length === 0 && (
             <p className="text-xs text-orange-600 mt-1">
-              Primero creá actividades en la sección "Actividades"
+              Primero creá actividades en la sección &quot;Actividades&quot;
             </p>
           )}
 
