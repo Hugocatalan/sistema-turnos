@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import { User, Mail, Phone, CreditCard, Calendar, Camera, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -118,7 +119,9 @@ export default function PerfilPage() {
             <div className="relative flex-shrink-0">
               <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/20 flex items-center justify-center overflow-hidden ring-4 ring-white/30">
                 {displayImage ? (
-                  <img src={displayImage} alt="Perfil" className="w-full h-full object-cover" />
+                  <div className="relative w-full h-full">
+                    <Image src={displayImage} alt="Perfil" fill className="object-cover" />
+                  </div>
                 ) : (
                   <User size={40} className="text-white" />
                 )}
@@ -235,30 +238,6 @@ export default function PerfilPage() {
               </div>
             </div>
           )}
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recordatorios</h3>
-        <div className="space-y-3">
-          <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
-            <p className="text-sm text-gray-600">
-              Recordá llegar 10 minutos antes de tu turno
-            </p>
-          </div>
-          <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-green-500 rounded-full mt-2" />
-            <p className="text-sm text-gray-600">
-              Traé ropa cómoda y una botella de agua
-            </p>
-          </div>
-          <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2" />
-            <p className="text-sm text-gray-600">
-              Si no podés asistir, cancelá tu turno con anticipación
-            </p>
-          </div>
         </div>
       </div>
     </div>

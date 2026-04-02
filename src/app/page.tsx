@@ -13,5 +13,5 @@ export default async function Home() {
     redirect('/admin');
   }
 
-  redirect('/alumno');
+  redirect('/usuario');
 }

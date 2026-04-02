@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { AlumnoLayout } from '@/components/alumno/AlumnoLayout';
+import { AlumnoLayout } from '@/components/usuario/AlumnoLayout';
 
 export default async function AlumnoLayoutPage({
   children

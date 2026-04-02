@@ -169,7 +169,7 @@ export default function MisTurnosPage() {
                 {tab === 'proximos' ? 'No tenés turnos reservados' : 'No hay turnos en el historial'}
               </p>
               {tab === 'proximos' && (
-                <Button className="mt-4" onClick={() => window.location.href = '/alumno'}>
+                <Button className="mt-4" onClick={() => window.location.href = '/usuario'}>
                   Reservar Turno
                 </Button>
               )}

@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { clsx } from 'clsx';
-import { Users, Calendar, Settings, MessageSquare, LayoutDashboard, CreditCard, Menu, X, Home, Bot, Palette, Activity } from 'lucide-react';
+import { Users, Calendar, Settings, MessageSquare, LayoutDashboard, CreditCard, Menu, X, Home, Bot, Palette, Activity, MessageCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 const items = [
@@ -12,6 +13,7 @@ const items = [
   { href: '/admin/actividades', icon: Activity, label: 'Actividades' },
   { href: '/admin/turnos', icon: Calendar, label: 'Turnos' },
   { href: '/admin/membresias', icon: CreditCard, label: 'Membresías' },
+  { href: '/admin/recomendaciones', icon: MessageCircle, label: 'Recomendaciones' },
   { href: '/admin/chatbot', icon: Bot, label: 'Chatbot' },
   { href: '/admin/configuracion', icon: Settings, label: 'Config' },
 ];
@@ -51,7 +53,9 @@ export function AdminSidebar() {
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-bold flex items-center gap-2">
               {config?.logoUrl ? (
-                <img src={config.logoUrl} alt="Logo" className="w-8 h-8 rounded object-contain bg-white p-1" />
+                <div className="relative w-8 h-8 rounded object-contain bg-white p-1">
+                  <Image src={config.logoUrl} alt="Logo" fill className="object-contain" />
+                </div>
               ) : (
                 <span className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
                   <LayoutDashboard size={18} className="text-white" />

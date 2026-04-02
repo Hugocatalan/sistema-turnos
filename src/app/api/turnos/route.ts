@@ -102,58 +102,56 @@ export async function POST(request: NextRequest) {
 
     const fechaTurno = new Date(parsed.data.fecha);
     
-    if (session.user.rol !== 'ADMIN') {
-      const ahora = new Date();
-      const diffHoras = (fechaTurno.getTime() - ahora.getTime()) / (1000 * 60 * 60);
-      if (diffHoras < 1) {
-        return NextResponse.json(
-          { error: 'No se pueden reservar turnos con menos de 1 hora de anticipación' },
-          { status: 400 }
-        );
-      }
-    }
+    // Verificar y crear turno de forma atómica para evitar race conditions
+    const resultado = await prisma.$transaction(async (tx) => {
+      // Verificar si ya existe un turno en ese horario
+      const turnoExistente = await tx.turno.findFirst({
+        where: {
+          fecha: {
+            gte: new Date(fechaTurno.setHours(0, 0, 0, 0)),
+            lte: new Date(fechaTurno.setHours(23, 59, 59, 999))
+          },
+          hora: parsed.data.hora,
+          clase: parsed.data.clase,
+          estado: 'RESERVADO'
+        }
+      });
 
-    const turnoExistente = await prisma.turno.findFirst({
-      where: {
-        usuarioId,
-        fecha: {
-          gte: new Date(fechaTurno.setHours(0, 0, 0, 0)),
-          lte: new Date(fechaTurno.setHours(23, 59, 59, 999))
-        },
-        hora: parsed.data.hora,
-        estado: 'RESERVADO'
+      if (turnoExistente) {
+        throw new Error('RESERVADO');
       }
+
+      // Crear el turno
+      return await tx.turno.create({
+        data: {
+          usuarioId,
+          fecha: new Date(parsed.data.fecha),
+          hora: parsed.data.hora,
+          clase: sanitizeString(parsed.data.clase),
+          instructor: parsed.data.instructor ? sanitizeString(parsed.data.instructor) : null,
+          notas: parsed.data.notas ? sanitizeString(parsed.data.notas) : null
+        },
+        include: {
+          usuario: {
+            select: {
+              id: true,
+              nombre: true,
+              apellido: true
+            }
+          }
+        }
+      });
     });
 
-    if (turnoExistente) {
+    return NextResponse.json(resultado, { status: 201 });
+  } catch (error) {
+    if (error instanceof Error && error.message === 'RESERVADO') {
       return NextResponse.json(
-        { error: 'Ya tenés un turno en ese horario' },
+        { error: 'Ese turno ya fue reservado por otra persona. Por favor elegí otro horario.' },
         { status: 400 }
       );
     }
-
-    const turno = await prisma.turno.create({
-      data: {
-        usuarioId,
-        fecha: new Date(parsed.data.fecha),
-        hora: parsed.data.hora,
-        clase: sanitizeString(parsed.data.clase),
-        instructor: parsed.data.instructor ? sanitizeString(parsed.data.instructor) : null,
-        notas: parsed.data.notas ? sanitizeString(parsed.data.notas) : null
-      },
-      include: {
-        usuario: {
-          select: {
-            id: true,
-            nombre: true,
-            apellido: true
-          }
-        }
-      }
-    });
-
-    return NextResponse.json(turno, { status: 201 });
-  } catch {
+    console.error('Error al crear turno:', error);
     return NextResponse.json(
       { error: 'Error al crear turno' },
       { status: 500 }

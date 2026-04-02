@@ -144,3 +144,13 @@ model RateLimit {
   @@unique([ip, endpoint])
   @@index([windowStart])
 }
+
+model Recomendacion {
+  id        String   @id @default(cuid())
+  texto     String
+  color     String   @default("#3B82F6")
+  orden     Int      @default(0)
+  activa    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

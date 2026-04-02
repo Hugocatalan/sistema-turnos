@@ -9,7 +9,7 @@ export function Input({ className, label, error, id, ...props }: InputProps) {
   return (
     <div className="space-y-1">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+        <label htmlFor={id} className="block text-sm font-medium text-black">
           {label}
         </label>
       )}
@@ -39,7 +39,7 @@ export function Select({ className, label, error, id, options, ...props }: Selec
   return (
     <div className="space-y-1">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+        <label htmlFor={id} className="block text-sm font-medium text-black">
           {label}
         </label>
       )}
@@ -72,7 +72,7 @@ export function Textarea({ className, label, error, id, ...props }: TextareaProp
   return (
     <div className="space-y-1">
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+        <label htmlFor={id} className="block text-sm font-medium text-black">
           {label}
         </label>
       )}

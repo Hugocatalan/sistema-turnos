@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Search, Plus, Edit2, Trash2, Eye, X, ChevronLeft, ChevronRight, UserPlus } from 'lucide-react';
+import Image from 'next/image';
+import { Search, Plus, Edit2, Trash2, Eye, X, ChevronLeft, ChevronRight, UserPlus, User } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
@@ -15,6 +16,7 @@ interface Usuario {
   telefono?: string;
   estadoMembresia: 'ACTIVA' | 'VENCIDA' | 'SUSPENDIDA';
   fechaVencimiento?: string;
+  imagenUrl?: string | null;
   _count: { turnos: number };
 }
 
@@ -141,6 +143,7 @@ export default function UsuariosPage() {
           <table className="w-full min-w-[600px]">
             <thead className="bg-gray-50">
               <tr className="text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3">Foto</th>
                 <th className="px-4 py-3">DNI</th>
                 <th className="px-4 py-3">Nombre</th>
                 <th className="px-4 py-3 hidden sm:table-cell">Contacto</th>
@@ -155,6 +158,17 @@ export default function UsuariosPage() {
                 <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">No hay usuarios</td></tr>
               ) : usuarios.map((u) => (
                 <tr key={u.id} className="hover:bg-gray-50 text-sm">
+                  <td className="px-4 py-3">
+                    {u.imagenUrl ? (
+                      <div className="relative w-10 h-10 rounded-full overflow-hidden">
+                        <Image src={u.imagenUrl} alt="Perfil" fill className="object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <User size={18} className="text-gray-400" />
+                      </div>
+                    )}
+                  </td>
                   <td className="px-4 py-3 font-mono">{u.dni}</td>
                   <td className="px-4 py-3 font-medium">{u.nombre} {u.apellido}</td>
                   <td className="px-4 py-3 text-gray-500 hidden sm:table-cell">

@@ -31,6 +31,13 @@ interface Actividad {
   activo: boolean;
 }
 
+interface Recomendacion {
+  id: string;
+  texto: string;
+  color: string;
+  activa: boolean;
+}
+
 const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
 export default function AlumnoReservarPage() {
@@ -38,6 +45,7 @@ export default function AlumnoReservarPage() {
   const [horarios, setHorarios] = useState<Horario[]>([]);
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [actividades, setActividades] = useState<Actividad[]>([]);
+  const [recomendaciones, setRecomendaciones] = useState<Recomendacion[]>([]);
   const [selectedClase, setSelectedClase] = useState('');
   const [selectedFecha, setSelectedFecha] = useState<Date | null>(null);
   const [selectedHora, setSelectedHora] = useState('');
@@ -54,17 +62,20 @@ export default function AlumnoReservarPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [hRes, tRes, aRes] = await Promise.all([
+      const [hRes, tRes, aRes, rRes] = await Promise.all([
         fetch('/api/horarios'),
         fetch('/api/turnos'),
-        fetch('/api/actividades')
+        fetch('/api/actividades'),
+        fetch('/api/recomendaciones')
       ]);
       const hData = await hRes.json();
       const tData = await tRes.json();
       const aData = await aRes.json();
+      const rData = await rRes.json();
       setHorarios(Array.isArray(hData) ? hData : []);
       setTurnos(Array.isArray(tData) ? tData : []);
       setActividades(Array.isArray(aData) ? aData.filter((a: Actividad) => a.activo) : []);
+      setRecomendaciones(Array.isArray(rData) ? rData.filter((r: Recomendacion) => r.activa) : []);
     } catch (e) {
       console.error('Error:', e);
     } finally {
@@ -191,12 +202,26 @@ export default function AlumnoReservarPage() {
                 <CalendarPlus size={16} />
                 Ver en Calendar
               </a>
-              <a href="/alumno/mis-turnos"
+              <a href="/usuario/mis-turnos"
                 className="flex items-center gap-2 px-4 py-2 bg-white text-blue-600 hover:bg-white/90 rounded-lg text-sm font-medium transition-colors">
                 Ver todos
                 <ArrowRight size={16} />
               </a>
             </div>
+          </div>
+        </div>
+      )}
+
+      {recomendaciones.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recomendaciones</h3>
+          <div className="space-y-3">
+            {recomendaciones.map((rec) => (
+              <div key={rec.id} className="flex items-start gap-3">
+                <div className="w-3 h-3 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: rec.color }} />
+                <p className="text-sm text-gray-700">{rec.texto}</p>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -207,18 +232,26 @@ export default function AlumnoReservarPage() {
           <p className="text-gray-500">Cargando horarios...</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="bg-gradient-to-br from-white via-white to-blue-50 rounded-2xl shadow-lg border border-blue-100 p-6 md:p-8">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-blue-100 rounded-full mb-4">
+              <Calendar size={28} className="text-blue-600" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Reserva tu turno aquí</h2>
+            <p className="text-gray-500">Selecciona el día y horario que más te convenga</p>
+          </div>
+
+          <div className="flex items-center justify-between mb-6 bg-gray-50 rounded-xl p-2">
             <Button variant="outline" size="sm" onClick={() => setWeekStart(addWeeks(weekStart, -1))}>
               <ChevronLeft size={18} />
             </Button>
-            <p className="font-semibold">{format(weekStart, "MMMM yyyy", { locale: es })}</p>
+            <p className="font-bold text-lg">{format(weekStart, "MMMM yyyy", { locale: es })}</p>
             <Button variant="outline" size="sm" onClick={() => setWeekStart(addWeeks(weekStart, 1))}>
               <ChevronRight size={18} />
             </Button>
           </div>
 
-          <div className="flex overflow-x-auto gap-2 pb-2 mb-6 -mx-2 px-2">
+          <div className="flex overflow-x-auto gap-3 pb-4 mb-6 -mx-2 px-2">
             {semana.map((fecha) => {
               const esHoy = format(fecha, 'yyyy-MM-dd') === hoy;
               const esPasado = fecha < new Date(new Date().setHours(0, 0, 0, 0));
@@ -228,43 +261,51 @@ export default function AlumnoReservarPage() {
                   key={fecha.toISOString()}
                   onClick={() => !esPasado && handleSelectDia(fecha)}
                   disabled={esPasado}
-                  className={`flex-shrink-0 p-3 rounded-lg text-center min-w-[60px] ${
-                    esPasado ? 'bg-gray-100 text-gray-400 cursor-not-allowed' :
-                    sel ? 'bg-blue-600 text-white' :
-                    esHoy ? 'bg-blue-50 text-blue-600 border-2 border-blue-300' :
-                    'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                  className={`flex-shrink-0 p-4 rounded-2xl text-center min-w-[80px] transition-all duration-200 hover:scale-105 ${
+                    esPasado ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' :
+                    sel ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg shadow-blue-200' :
+                    esHoy ? 'bg-gradient-to-br from-blue-50 to-blue-100 text-blue-700 border-2 border-blue-300 shadow-md' :
+                    'bg-white hover:bg-blue-50 text-gray-700 border border-gray-200 hover:border-blue-200 hover:shadow-md'
                   }`}
                 >
-                  <p className="text-xs">{format(fecha, 'EEE', { locale: es })}</p>
-                  <p className="text-lg font-bold">{format(fecha, 'd')}</p>
+                  <p className="text-xs font-medium uppercase">{format(fecha, 'EEE', { locale: es })}</p>
+                  <p className="text-2xl font-bold mt-1">{format(fecha, 'd')}</p>
+                  {esHoy && <p className="text-xs font-bold mt-1 text-blue-600">HOY</p>}
                 </button>
               );
             })}
           </div>
 
           {selectedFecha && (
-            <div className="mt-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Calendar size={18} className="text-blue-600" />
-                <span className="font-medium">
-                  {diasSemana[selectedFecha.getDay()]} {format(selectedFecha, "d 'de' MMMM", { locale: es })}
-                </span>
+            <div className="mt-8 animate-fadeIn">
+              <div className="flex items-center gap-3 mb-6 bg-blue-50 p-4 rounded-xl">
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                  <Calendar size={20} className="text-white" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900 text-lg">
+                    {diasSemana[selectedFecha.getDay()]} {format(selectedFecha, "d 'de' MMMM", { locale: es })}
+                  </p>
+                  <p className="text-sm text-gray-500">{getHorariosDelDia().length} horarios disponibles</p>
+                </div>
               </div>
 
-              <div className="mb-4">
-                <p className="text-sm font-medium mb-2">Actividad:</p>
+              <div className="mb-6">
+                <p className="text-sm font-semibold mb-3 text-gray-700">Elegí una actividad:</p>
                 {actividades.length === 0 ? (
                   <p className="text-gray-500 text-sm">No hay actividades disponibles</p>
                 ) : (
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3">
                     {actividades.map(act => (
                       <button
                         key={act.id}
                         onClick={() => setSelectedClase(act.nombre)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                          selectedClase === act.nombre ? 'text-white' : 'bg-gray-100 hover:bg-gray-200'
+                        className={`px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:scale-105 ${
+                          selectedClase === act.nombre 
+                            ? 'text-white shadow-lg' 
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                         }`}
-                        style={selectedClase === act.nombre ? { backgroundColor: act.color } : {}}
+                        style={selectedClase === act.nombre ? { backgroundColor: act.color, boxShadow: `0 4px 14px ${act.color}40` } : {}}
                       >
                         {act.nombre}
                       </button>
@@ -274,12 +315,12 @@ export default function AlumnoReservarPage() {
               </div>
 
               {selectedClase && (
-                <div>
-                  <p className="text-sm font-medium mb-2">Horarios:</p>
+                <div className="animate-fadeIn">
+                  <p className="text-sm font-semibold mb-3 text-gray-700">Horarios disponibles:</p>
                   {getHorariosDelDia().length === 0 ? (
                     <p className="text-gray-500 text-sm">No hay horarios para {selectedClase} este día</p>
                   ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                       {getHorariosDelDia().map((h) => {
                         const reservado = isReservado(h.horaInicio);
                         return (
@@ -287,14 +328,16 @@ export default function AlumnoReservarPage() {
                             key={h.id}
                             onClick={() => !reservado && (setSelectedHora(h.horaInicio), setSelectedHorario(h))}
                             disabled={reservado}
-                            className={`p-3 rounded-lg text-center ${
-                              reservado ? 'bg-red-100 text-red-400 line-through cursor-not-allowed border-2 border-red-200' :
-                              selectedHora === h.horaInicio ? 'bg-green-600 text-white border-2 border-green-600' :
-                              'bg-gray-100 hover:bg-green-100 border-2 border-transparent hover:border-green-300'
+                            className={`p-4 rounded-xl text-center transition-all duration-200 hover:scale-105 ${
+                              reservado 
+                                ? 'bg-red-50 text-red-400 cursor-not-allowed border-2 border-red-200' 
+                                : selectedHora === h.horaInicio 
+                                  ? 'bg-gradient-to-br from-green-500 to-green-600 text-white border-2 border-green-500 shadow-lg shadow-green-200' 
+                                  : 'bg-white hover:bg-green-50 border-2 border-gray-200 hover:border-green-300 hover:shadow-md'
                             }`}
                           >
-                            <p className="font-bold">{h.horaInicio}</p>
-                            {reservado && <p className="text-xs">Reservado</p>}
+                            <p className="font-bold text-lg">{h.horaInicio}</p>
+                            {reservado && <p className="text-xs font-medium">Ocupado</p>}
                           </button>
                         );
                       })}
@@ -304,9 +347,9 @@ export default function AlumnoReservarPage() {
               )}
 
               {selectedClase && selectedHora && (
-                <Button className="w-full mt-6" onClick={() => setModalOpen(true)}>
-                  <Check size={18} className="mr-2" />
-                  Reservar {selectedClase} {selectedHora}
+                <Button className="w-full mt-8 py-4 text-lg font-bold" onClick={() => setModalOpen(true)}>
+                  <Check size={22} className="mr-2" />
+                  Reservar {selectedClase} - {selectedHora}
                 </Button>
               )}
             </div>

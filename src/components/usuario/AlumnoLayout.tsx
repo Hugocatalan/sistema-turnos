@@ -3,6 +3,7 @@
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { clsx } from 'clsx';
 import { Calendar, Clock, User, MessageSquare, LogOut, Menu, X, Home, Users, CreditCard, Settings, Bot } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -14,9 +15,9 @@ interface Props {
 }
 
 const navItems = [
-  { href: '/alumno', icon: Home, label: 'Inicio' },
-  { href: '/alumno/mis-turnos', icon: Clock, label: 'Mis Turnos' },
-  { href: '/alumno/perfil', icon: User, label: 'Mi Perfil' },
+  { href: '/usuario', icon: Home, label: 'Inicio' },
+  { href: '/usuario/mis-turnos', icon: Clock, label: 'Mis Turnos' },
+  { href: '/usuario/perfil', icon: User, label: 'Mi Perfil' },
 ];
 
 export function AlumnoLayout({ children, user }: Props) {
@@ -31,6 +32,13 @@ export function AlumnoLayout({ children, user }: Props) {
   const [logoUrl, setLogoUrl] = useState('');
   const [userImage, setUserImage] = useState('');
 
+  const fetchUserData = async () => {
+    try {
+      const userData = await fetch('/api/users/me').then(res => res.json());
+      if (userData.imagenUrl) setUserImage(userData.imagenUrl);
+    } catch {}
+  };
+
   useEffect(() => {
     setMounted(true);
     Promise.all([
@@ -41,6 +49,12 @@ export function AlumnoLayout({ children, user }: Props) {
       if (configData.logoUrl) setLogoUrl(configData.logoUrl);
       if (userData.imagenUrl) setUserImage(userData.imagenUrl);
     }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const handleImageUpdate = () => fetchUserData();
+    window.addEventListener('user-updated', handleImageUpdate);
+    return () => window.removeEventListener('user-updated', handleImageUpdate);
   }, []);
 
   if (!mounted) {
@@ -86,15 +100,17 @@ export function AlumnoLayout({ children, user }: Props) {
               >
                 {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
-              <Link href="/alumno" className="flex items-center gap-2">
+              <Link href="/usuario" className="flex items-center gap-2">
                 {logoUrl ? (
-                  <img src={logoUrl} alt="Logo" className="h-9 w-auto object-contain" />
+                  <div className="relative h-9 w-auto aspect-square">
+                    <Image src={logoUrl} alt="Logo" fill className="object-contain" />
+                  </div>
                 ) : (
                   <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
                     <Calendar size={18} className="text-white" />
                   </div>
                 )}
-                <span className="font-bold text-gray-900 hidden sm:block">{empresaNombre || 'Reserva de Turnos'}</span>
+                <span className="font-bold text-gray-900 truncate max-w-[150px]">{empresaNombre || 'Reserva de Turnos'}</span>
               </Link>
             </div>
             <div className="flex items-center gap-2">
@@ -125,7 +141,9 @@ export function AlumnoLayout({ children, user }: Props) {
             <div className="p-4 border-b">
               <div className="flex items-center gap-3">
                 {userImage ? (
-                  <img src={userImage} alt="Perfil" className="w-11 h-11 rounded-full object-cover ring-2 ring-white" />
+                  <div className="relative w-11 h-11 rounded-full overflow-hidden ring-2 ring-white">
+                    <Image src={userImage} alt="Perfil" fill className="object-cover" />
+                  </div>
                 ) : (
                   <div className="w-11 h-11 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ring-2 ring-white">
                     <User size={22} className="text-gray-600" />
