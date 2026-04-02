@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id              String   @id @default(cuid())
+  dni             String   @unique
+  nombre          String
+  apellido        String
+  email           String?
+  telefono        String?
+  rol             String   @default("ALUMNO")
+  estadoMembresia String   @default("ACTIVA")
+  fechaVencimiento DateTime?
+  imagenUrl       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  turnos          Turno[]
+  historialCambios HistorialCambio[]
+
+  @@index([dni])
+  @@index([estadoMembresia])
+}
+
+model Turno {
+  id            String   @id @default(cuid())
+  usuarioId     String
+  fecha         DateTime
+  hora          String
+  clase         String
+  instructor    String?
+  estado        String   @default("RESERVADO")
+  notas         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  usuario       Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  cambios       HistorialCambio[]
+
+  @@index([fecha])
+  @@index([usuarioId])
+  @@index([estado])
+}
+
+model ReglaModificacion {
+  id                     String   @id @default(cuid())
+  horasMinimasAntelacion Int      @default(24)
+  permiteCancelar        Boolean  @default(true)
+  permiteReprogramar     Boolean  @default(true)
+  maxCambiosPorSemana    Int      @default(2)
+  requierePagoDia        Boolean  @default(false)
+  mensajePersonalizado   String?
+  activo                 Boolean  @default(true)
+  updatedAt              DateTime @updatedAt
+}
+
+model ConfiguracionSitio {
+  id                  String   @id @default(cuid())
+  nombreEmpresa       String   @default("Mi Gimnasio")
+  logoUrl             String?
+  colorPrimario       String   @default("#3B82F6")
+  colorSecundario     String   @default("#1E40AF")
+  colorFondo          String   @default("#F8FAFC")
+  colorTexto          String   @default("#1E293B")
+  tipoFondo           String   @default("color")
+  fondoPersonalizado  String?
+  telefono            String?
+  email               String?
+  direccion           String?
+  horaApertura        String   @default("08:00")
+  horaCierre          String   @default("22:00")
+  diasLaborales       String   @default("1,2,3,4,5,6")
+  updatedAt           DateTime @updatedAt
+}
+
+model HorarioClase {
+  id        String   @id @default(cuid())
+  clase     String
+  horaInicio String
+  horaFin   String
+  dia       Int
+  instructor String?
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Actividad {
+  id          String   @id @default(cuid())
+  nombre      String
+  descripcion String?
+  duracion    Int      @default(60)
+  color       String   @default("#3B82F6")
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([activo])
+}
+
+model PreguntaFrecuente {
+  id        String   @id @default(cuid())
+  pregunta  String
+  respuesta String
+  categoria String?
+  activa    Boolean  @default(true)
+  orden     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoria])
+  @@index([activa])
+}
+
+model HistorialCambio {
+  id            String   @id @default(cuid())
+  usuarioId     String
+  turnoId       String
+  tipoCambio    String
+  detalle       String?
+  realizadoPor  String
+  createdAt     DateTime @default(now())
+
+  usuario       Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  turno         Turno    @relation(fields: [turnoId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([turnoId])
+}
+
+model RateLimit {
+  id          String   @id @default(cuid())
+  ip          String
+  endpoint    String
+  count       Int      @default(1)
+  windowStart DateTime @default(now())
+
+  @@unique([ip, endpoint])
+  @@index([windowStart])
+}
