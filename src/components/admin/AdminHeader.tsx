@@ -1,7 +1,7 @@
 'use client';
 
 import { signOut } from 'next-auth/react';
-import { Bell, LogOut, User, Menu } from 'lucide-react';
+import { LogOut, User, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { UsuarioSession } from '@/types';
 import { useEffect, useState } from 'react';
@@ -26,29 +26,24 @@ export function AdminHeader({ user }: Props) {
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
-      <div className="flex items-center justify-between">
-        <div className="pl-10 md:pl-0">
-          <h2 className="text-lg md:text-xl font-semibold text-gray-900">
+    <header className="bg-white border-b border-gray-200 px-2 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 overflow-x-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+        <div className="pl-8 sm:pl-0 text-center sm:text-left min-w-0 order-2 sm:order-1">
+          <h2 className="text-sm sm:text-lg md:text-xl font-semibold text-gray-900 truncate">
             Hola, {user.nombre}
           </h2>
-          <p className="text-xs md:text-sm text-gray-500">
+          <p className="text-xs sm:text-sm text-gray-500 truncate">
             {config?.nombreEmpresa ? `Administrando ${config.nombreEmpresa}` : 'Panel de Administración'}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 md:gap-4">
-          <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg">
-            <Bell size={20} />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-          </button>
-
-          <div className="hidden sm:flex items-center gap-3 pl-4 border-l border-gray-200">
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">{user.nombre}</p>
-              <p className="text-xs text-gray-500">Administrador</p>
+        <div className="flex items-center justify-end gap-1 sm:gap-2 md:gap-4 flex-shrink-0 order-1 sm:order-2">
+          <div className="hidden sm:flex items-center gap-2 md:gap-3 pl-2 md:pl-4 border-l border-gray-200">
+            <div className="text-right min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">{user.nombre}</p>
+              <p className="text-xs text-gray-500">Admin</p>
             </div>
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
               <User size={20} className="text-blue-600" />
             </div>
           </div>
@@ -57,7 +52,7 @@ export function AdminHeader({ user }: Props) {
             variant="outline"
             size="sm"
             onClick={() => signOut({ callbackUrl: '/login' })}
-            className="text-xs md:text-sm"
+            className="text-xs px-2 sm:px-3"
           >
             <LogOut size={16} className="mr-1" />
             <span className="hidden sm:inline">Salir</span>

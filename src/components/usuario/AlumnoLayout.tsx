@@ -89,42 +89,42 @@ export function AlumnoLayout({ children, user }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen bg-gray-100 flex flex-col overflow-x-hidden">
       <nav className="bg-white shadow-sm sticky top-0 z-40 flex-shrink-0">
-        <div className="px-4">
-          <div className="flex justify-between h-14">
-            <div className="flex items-center gap-3">
+        <div className="px-2 sm:px-4">
+          <div className="flex justify-between h-12 sm:h-14">
+            <div className="flex items-center gap-1 sm:gap-3 min-w-0 flex-1">
               <button 
                 onClick={() => setSidebarOpen(!sidebarOpen)} 
-                className="p-2 rounded-lg hover:bg-gray-100 md:hidden"
+                className="p-2 rounded-lg hover:bg-gray-100 flex-shrink-0"
               >
-                {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+                {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
-              <Link href="/usuario" className="flex items-center gap-2">
+              <Link href="/usuario" className="flex items-center gap-2 min-w-0">
                 {logoUrl ? (
-                  <div className="relative h-9 w-auto aspect-square">
+                  <div className="relative h-7 w-7 sm:h-9 sm:w-9 flex-shrink-0">
                     <Image src={logoUrl} alt="Logo" fill className="object-contain" />
                   </div>
                 ) : (
-                  <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <Calendar size={18} className="text-white" />
+                  <div className="w-7 h-7 sm:w-9 sm:h-9 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Calendar size={14} className="text-white sm:w-[18px]" />
                   </div>
                 )}
-                <span className="font-bold text-gray-900 truncate max-w-[150px]">{empresaNombre || 'Reserva de Turnos'}</span>
+                <span className="font-bold text-gray-900 text-sm sm:text-base truncate hidden xs:inline">{empresaNombre || 'Reserva de Turnos'}</span>
               </Link>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
               <button 
                 onClick={() => setChatOpen(true)}
                 className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
               >
-                <MessageSquare size={22} />
+                <MessageSquare size={20} />
               </button>
               <button 
                 onClick={() => signOut({ callbackUrl: '/login' })}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
               >
-                <LogOut size={18} />
+                <LogOut size={16} />
                 <span className="hidden sm:inline">Cerrar sesión</span>
               </button>
             </div>
