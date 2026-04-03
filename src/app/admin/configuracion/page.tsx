@@ -30,7 +30,7 @@ interface Reglas {
   permiteReprogramar: boolean;
   maxCambiosPorSemana: number;
   requierePagoDia: boolean;
-  mensajePersonalizado?: string;
+  mensajePersonalizado?: string | null;
 }
 
 const plantillasFondo = [

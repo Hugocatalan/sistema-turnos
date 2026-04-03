@@ -60,12 +60,13 @@ export const modificarTurnoSchema = z.object({
 });
 
 export const reglaSchema = z.object({
-  horasMinimasAntelacion: z.number().min(0).max(72),
-  permiteCancelar: z.boolean(),
-  permiteReprogramar: z.boolean(),
-  maxCambiosPorSemana: z.number().min(0).max(10),
-  requierePagoDia: z.boolean(),
-  mensajePersonalizado: z.string().max(500).optional(),
+    id: z.string().optional(),
+    horasMinimasAntelacion: z.number().min(0).max(72),
+    permiteCancelar: z.boolean(),
+    permiteReprogramar: z.boolean(),
+    maxCambiosPorSemana: z.number().min(0).max(10),
+    requierePagoDia: z.boolean(),
+  mensajePersonalizado: z.string().max(500).optional().nullable(),
 });
 
 export const configSchema = z.object({

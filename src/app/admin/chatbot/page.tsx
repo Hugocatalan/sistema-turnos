@@ -93,7 +93,15 @@ export default function ChatbotPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('¿Eliminar esta pregunta?')) return;
-    // Por ahora no hay endpoint DELETE, pero el admin puede cambiar activa a false
+    try {
+      const res = await fetch(`/api/chatbot/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Error al eliminar');
+      // Refrescar la lista
+      fetchPreguntas();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error');
+    }
   };
 
   const handlePreview = async () => {
@@ -200,6 +208,10 @@ export default function ChatbotPage() {
                       <button onClick={() => handleOpenModal(p)}
                         className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
                         <Edit2 size={18} />
+                      </button>
+                      <button onClick={() => handleDelete(p.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg" title="Eliminar">
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </td>
