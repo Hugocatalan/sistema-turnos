@@ -16,6 +16,8 @@ interface Turno {
   instructor?: string;
   estado: string;
   usuario: { id: string; nombre: string; apellido: string; telefono?: string };
+  archivado?: boolean;
+  archivadoEn?: string | null;
 }
 
 interface Usuario {

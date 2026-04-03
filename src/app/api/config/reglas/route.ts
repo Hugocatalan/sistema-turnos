@@ -52,13 +52,16 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Remove id from parsed.data to avoid conflicts with upsert
+    const { id: _, ...dataWithoutId } = parsed.data;
+    
     const reglas = await prisma.reglaModificacion.upsert({
       where: { id: 'default' },
       create: {
         id: 'default',
-        ...parsed.data
+        ...dataWithoutId
       },
-      update: parsed.data
+      update: dataWithoutId
     });
 
     return NextResponse.json(reglas);

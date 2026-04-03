@@ -24,11 +24,19 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const fecha = searchParams.get('fecha');
   const estado = searchParams.get('estado');
+  const includeArchivados = searchParams.get('includeArchivados');
+  const archivadoEnabled = process.env.TURNOS_ARCHIVADO_ENABLED !== 'false';
 
   const where: Record<string, unknown> = {};
 
   if (session.user.rol === 'ADMIN') {
-    console.log('Es admin, devolviendo todos los turnos');
+    console.log('Es admin, devolviendo turnos');
+    if (archivadoEnabled) {
+      if (includeArchivados !== 'true') {
+        where.archivado = false;
+      }
+      // si includeArchivados es true y está habilitado, no filtramos archivado
+    }
     if (estado) where.estado = estado;
   } else {
     where.usuarioId = session.user.id;
@@ -41,6 +49,26 @@ export async function GET(request: NextRequest) {
     const fechaFin = new Date(fecha);
     fechaFin.setHours(23, 59, 59, 999);
     where.fecha = { gte: fechaInicio, lte: fechaFin };
+  }
+
+  // Archivar turnos pasados si la característica está habilitada
+  const archivadoEnabled2 = process.env.TURNOS_ARCHIVADO_ENABLED !== 'false';
+  if (archivadoEnabled2) {
+    try {
+      // Cast to any to avoid TS conflicts with generated Prisma types before regen
+      await (prisma.turno.updateMany as any)({
+        where: {
+          archivado: false,
+          fecha: { lt: new Date() }
+        },
+        data: {
+          archivado: true,
+          archivadoEn: new Date()
+        }
+      });
+    } catch {
+      // No bloqueará la petición si falla el archivado
+    }
   }
 
   try {

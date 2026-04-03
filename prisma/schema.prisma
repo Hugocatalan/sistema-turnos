@@ -37,6 +37,8 @@ model Turno {
   instructor    String?
   estado        String   @default("RESERVADO")
   notas         String?
+  archivado     Boolean  @default(false)
+  archivadoEn   DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
