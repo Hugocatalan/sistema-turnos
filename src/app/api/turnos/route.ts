@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   const fecha = searchParams.get('fecha');
   const estado = searchParams.get('estado');
   const includeArchivados = searchParams.get('includeArchivados');
-  const archivadoEnabled = process.env.TURNOS_ARCHIVADO_ENABLED !== 'false';
+  const archivadoEnabled = (process.env.TURNOS_ARCHIVADO_ENABLED ?? 'false') === 'true';
 
   const where: Record<string, unknown> = {};
 
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Archivar turnos pasados si la característica está habilitada
-  const archivadoEnabled2 = process.env.TURNOS_ARCHIVADO_ENABLED !== 'false';
+  const archivadoEnabled2 = (process.env.TURNOS_ARCHIVADO_ENABLED ?? 'false') === 'true';
   if (archivadoEnabled2) {
     try {
       // Cast to any to avoid TS conflicts with generated Prisma types before regen
