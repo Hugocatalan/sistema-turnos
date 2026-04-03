@@ -35,7 +35,6 @@ export async function GET(request: NextRequest) {
       if (includeArchivados !== 'true') {
         where.archivado = false;
       }
-      // si includeArchivados es true y está habilitado, no filtramos archivado
     }
     if (estado) where.estado = estado;
   } else {
@@ -52,22 +51,15 @@ export async function GET(request: NextRequest) {
   }
 
   // Archivar turnos pasados si la característica está habilitada
-  const archivadoEnabled2 = (process.env.TURNOS_ARCHIVADO_ENABLED ?? 'false') === 'true';
-  if (archivadoEnabled2) {
+  const archivado2 = (process.env.TURNOS_ARCHIVADO_ENABLED ?? 'false') === 'true';
+  if (archivado2) {
     try {
-      // Cast to any to avoid TS conflicts with generated Prisma types before regen
       await (prisma.turno.updateMany as any)({
-        where: {
-          archivado: false,
-          fecha: { lt: new Date() }
-        },
-        data: {
-          archivado: true,
-          archivadoEn: new Date()
-        }
+        where: { archivado: false, fecha: { lt: new Date() } },
+        data: { archivado: true, archivadoEn: new Date() }
       });
     } catch {
-      // No bloqueará la petición si falla el archivado
+      // ignore
     }
   }
 
@@ -130,9 +122,7 @@ export async function POST(request: NextRequest) {
 
     const fechaTurno = new Date(parsed.data.fecha);
     
-    // Verificar y crear turno de forma atómica para evitar race conditions
     const resultado = await prisma.$transaction(async (tx) => {
-      // Verificar si ya existe un turno en ese horario
       const turnoExistente = await tx.turno.findFirst({
         where: {
           fecha: {
@@ -149,7 +139,6 @@ export async function POST(request: NextRequest) {
         throw new Error('RESERVADO');
       }
 
-      // Crear el turno
       return await tx.turno.create({
         data: {
           usuarioId,
